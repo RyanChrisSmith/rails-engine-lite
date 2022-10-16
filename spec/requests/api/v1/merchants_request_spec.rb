@@ -21,9 +21,6 @@ describe "Merchants API" do
 
       expect(merchant[:attributes]).to have_key(:name)
       expect(merchant[:attributes][:name]).to be_a(String)
-
-      expect(merchant[:relationships]).to have_key(:items)
-      expect(merchant[:relationships][:items]).to have_key(:data)
     end
   end
 
@@ -44,8 +41,5 @@ describe "Merchants API" do
 
     expect(merchant[:data][:attributes]).to have_key(:name)
     expect(merchant[:data][:attributes][:name]).to be_a(String)
-
-    expect(merchant[:data][:relationships]).to have_key(:items)
-    expect(merchant[:data][:relationships][:items]).to have_key(:data)
   end
 end
