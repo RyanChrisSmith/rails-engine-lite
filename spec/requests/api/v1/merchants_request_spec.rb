@@ -10,14 +10,20 @@ describe "Merchants API" do
 
     merchants = JSON.parse(response.body, symbolize_names: true)
 
-    expect(merchants.count).to eq 10
+    expect(merchants[:data].count).to eq 10
 
-    merchants.each do |merchant|
+    merchants[:data].each do |merchant|
       expect(merchant).to have_key(:id)
-      expect(merchant[:id]).to be_an(Integer)
+      expect(merchant[:id]).to be_a(String)
 
-      expect(merchant).to have_key(:name)
-      expect(merchant[:name]).to be_a(String)
+      expect(merchant).to have_key(:type)
+      expect(merchant[:type]).to eq("merchant")
+
+      expect(merchant[:attributes]).to have_key(:name)
+      expect(merchant[:attributes][:name]).to be_a(String)
+
+      expect(merchant[:relationships]).to have_key(:items)
+      expect(merchant[:relationships][:items]).to have_key(:data)
     end
   end
 
@@ -30,33 +36,16 @@ describe "Merchants API" do
 
     expect(response).to be_successful
 
-    expect(merchant).to have_key(:id)
-    expect(merchant[:id]).to eq(id)
+    expect(merchant[:data]).to have_key(:id)
+    expect(merchant[:data][:id]).to eq(id.to_s)
 
-    expect(merchant).to have_key(:name)
-    expect(merchant[:name]).to be_a(String)
-  end
+    expect(merchant[:data]).to have_key(:type)
+    expect(merchant[:data][:type]).to eq("merchant")
 
-  it 'can get a merchants items' do
-    merchant = create(:merchant)
-    items = create_list(:item, 10, merchant: merchant)
+    expect(merchant[:data][:attributes]).to have_key(:name)
+    expect(merchant[:data][:attributes][:name]).to be_a(String)
 
-    get "/api/v1/merchants/#{merchant.id}/items"
-
-    expect(response).to be_successful
-
-    items = JSON.parse(response.body, symbolize_names: true)
-    expect(items.count).to eq 10
-
-    items.each do |item|
-      expect(item).to have_key(:name)
-      expect(item[:name]).to be_a(String)
-
-      expect(item).to have_key(:description)
-      expect(item[:description]).to be_a(String)
-
-      expect(item).to have_key(:unit_price)
-      expect(item[:unit_price]).to be_a(Float)
-    end
+    expect(merchant[:data][:relationships]).to have_key(:items)
+    expect(merchant[:data][:relationships][:items]).to have_key(:data)
   end
 end
