@@ -93,21 +93,18 @@ describe "Items API" do
     expect(merchant[:data][:attributes][:name]).to eq("#{merchant_1.name}")
   end
 
+  it 'can update an existing item' do
+    id = create(:item).id
+    previous_name = Item.last.name
+    item_params = { name: "Dragons Milk" }
+    headers = {"CONTENT_TYPE" => "application/json"}
 
+    patch api_v1_item_path(id), headers: headers, params: JSON.generate({item: item_params})
+    item = Item.find_by(id: id)
 
+    expect(response).to be_successful
 
-  # xit 'can update an existing item' do
-  #   id = create(:item).id
-  #   previous_name = Item.last.name
-  #   item_params = { name: "Dragons Milk" }
-  #   headers = {"{CONTENT_TYPE" => "application/json"}
-
-  #   patch api_v1_item_path(id), headers: headers, params: JSON.generate(item: item_params)
-  #   item = Item.find_by(id: id)
-
-  #   expect(response).to be_successful
-
-  #   expect(item.name).to_not eq(previous_name)
-  #   expect(item.name).to eq('Dragons Milk')
-  # end
+    expect(item.name).to_not eq(previous_name)
+    expect(item.name).to eq('Dragons Milk')
+  end
 end
