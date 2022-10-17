@@ -82,4 +82,34 @@ describe "Items API" do
     expect(item_returned[:data][:attributes]).to have_key(:merchant_id)
     expect(item_returned[:data][:attributes][:merchant_id]).to be_an(Integer)
   end
+
+  it 'can create a new item' do
+    merchant = create(:merchant)
+    item_params = ({"name": "Dragon's Milk", "description": "great for digestions", "unit_price": 12.66, "merchant_id": merchant.id})
+    headers = {"CONTENT_TYPE" => "application/json"}
+
+    post '/api/v1/items', headers: headers, params: JSON.generate(item: item_params)
+    new_item = Item.last
+
+    expect(response).to be_successful
+    expect(new_item.name).to eq("Dragon's Milk")
+    expect(new_item.description).to eq('great for digestions')
+    expect(new_item.unit_price).to eq 12.66
+    expect(new_item.merchant_id).to eq(merchant.id)
+  end
+
+  # xit 'can update an existing item' do
+  #   id = create(:item).id
+  #   previous_name = Item.last.name
+  #   item_params = { name: "Dragons Milk" }
+  #   headers = {"{CONTENT_TYPE" => "application/json"}
+
+  #   patch api_v1_item_path(id), headers: headers, params: JSON.generate(item: item_params)
+  #   item = Item.find_by(id: id)
+
+  #   expect(response).to be_successful
+
+  #   expect(item.name).to_not eq(previous_name)
+  #   expect(item.name).to eq('Dragons Milk')
+  # end
 end
