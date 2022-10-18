@@ -48,4 +48,18 @@ RSpec.describe 'Item Searches' do
       expect(item_returned[:attributes][:name]).to_not include(item_1.name)
     end
   end
+
+  it 'will error when searching by price and name at the same time' do
+    merchant = create(:merchant)
+    item_1 = Item.create!(name: 'Turing school', description: 'stuff in the basement', unit_price: 22.99, merchant: merchant)
+    item_2 = Item.create!(name: 'Necklace', description: 'This silver chime will bring you cheer!', unit_price: 55.11, merchant: merchant)
+    item_3 = Item.create!(name: "Johns record", description: 'best music you ever heard', unit_price: 61.11, merchant: merchant)
+
+    get '/api/v1/items/find?name=ent&max_price=56.00'
+    parsed = JSON.parse(response.body, symbolize_names: true)
+
+    expect(response.status).to eq(400)
+    expect(parsed).to have_key(:errors)
+    expect(parsed[:errors][:details]).to eq("Must search by name OR price")
+  end
 end

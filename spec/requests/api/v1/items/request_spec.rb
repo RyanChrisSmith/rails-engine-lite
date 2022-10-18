@@ -93,6 +93,19 @@ describe "Items API" do
     expect(merchant[:data][:attributes][:name]).to eq("#{merchant_1.name}")
   end
 
+  it 'can get an error when item not found, so no merchant can be returned' do
+    merchant = create(:merchant)
+    item = create(:item, merchant: merchant)
+    bad_id = item.id + 1
+
+    get "/api/v1/items/#{bad_id}/merchant"
+    parsed = JSON.parse(response.body, symbolize_names: true)
+
+    expect(response.status).to eq(404)
+    expect(parsed).to have_key(:errors)
+    expect(parsed[:errors][:details]).to eq("No items were found with item id: #{bad_id}")
+  end
+
   it 'can update an existing item' do
     id = create(:item).id
     previous_name = Item.last.name
