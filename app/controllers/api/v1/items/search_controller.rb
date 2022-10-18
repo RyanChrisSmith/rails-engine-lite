@@ -1,15 +1,11 @@
 class Api::V1::Items::SearchController < ApplicationController
-  def show
-    if params[:name]
-      item = Item.where('name ILIKE ?', "%#{params[:name]}%").or(Item.where('description ILIKE ?', "%#{params[:name]}%")).first
-    elsif params[:min_price]
-      item = Item.where("items.unit_price >=?", params[:min_price]).order(:name)
-    end
-
-    if item.nil?
-      render json: { data: {message: 'No matching item'}}, status: 400
-    else
-      render json: ItemSerializer.new(item)
+  def find_one
+    if params[:name].present? && params[:min_price].present? || params[:max_price].present? && params[:name].present?
+      render json: {errors: { details: "Must search by name OR price"}}, status: 400
+    elsif params[:min_price] != nil || params[:max_price] != nil
+      render json: ItemSerializer.new(Item.price_search(params))
+    elsif params[:name].present?
+      render json: ItemSerializer.new(Item.search(params[:name]))
     end
   end
 end
