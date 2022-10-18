@@ -33,4 +33,20 @@ RSpec.describe 'Merchant Searches' do
     expect(response.status).to eq 400
     expect(response.message).to eq('Bad Request')
   end
+
+  it 'returns an empty array if no merchants are found' do
+    merchant_1 = Merchant.create!(name: 'EMPloyee')
+    merchant_2 = Merchant.create!(name: 'Emporer')
+    merchant_3 = Merchant.create!(name: 'The temp')
+    merchant_4 = Merchant.create!(name: 'Williams Tavern')
+    merchant_5 = Merchant.create!(name: "Emigo's")
+
+    get '/api/v1/merchants/find_all?name=z'
+
+    parsed = JSON.parse(response.body, symbolize_names: true)
+    found = parsed[:data]
+
+    expect(response.status).to eq 404
+    expect(found).to eq([])
+  end
 end
