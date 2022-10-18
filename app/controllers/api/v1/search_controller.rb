@@ -1,7 +1,7 @@
 class Api::V1::SearchController < ApplicationController
 
   def find_all_merchants
-    if params[:name] == ''
+    if params[:name] == ""
       render status: 400
     else
       merchant = Merchant.where('name ILIKE ?', "%#{params[:name]}%")
