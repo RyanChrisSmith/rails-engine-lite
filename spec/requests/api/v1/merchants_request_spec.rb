@@ -24,6 +24,16 @@ describe "Merchants API" do
     end
   end
 
+  it 'SAD PATH will return a blank parse if no merchants are in the database' do
+    get api_v1_merchants_path
+
+    expect(response).to be_successful
+    merchants = JSON.parse(response.body, symbolize_names: true)
+
+    expect(merchants[:data].count).to eq 0
+    expect(merchants[:data]).to eq([])
+  end
+
   it 'can get one merchant by its id' do
     id = create(:merchant).id
 
