@@ -53,6 +53,18 @@ describe "Merchants API" do
     expect(merchant[:data][:attributes][:name]).to be_a(String)
   end
 
+  it 'will return an error when merchant id is invalid' do
+    bad_id = create(:merchant).id + 1
+
+    get "/api/v1/merchants/#{bad_id}"
+
+    merchant = JSON.parse(response.body, symbolize_names: true)
+
+    expect(response.status).to eq 404
+    expect(merchant).to have_key(:errors)
+    expect(merchant[:errors][:details]).to eq("No merchant matches this id")
+  end
+
   it 'can get a list of a specific merchant items' do
     merchant = create(:merchant)
     items = create_list(:item, 10, merchant: merchant)
@@ -85,7 +97,7 @@ describe "Merchants API" do
     end
   end
 
-  it 'will return an error when merchant id not valid' do
+  it 'will return an error for merchant items when merchant id not valid' do
     merchant = create(:merchant)
     items = create_list(:item, 10, merchant: merchant)
     bad_id = merchant.id + 1

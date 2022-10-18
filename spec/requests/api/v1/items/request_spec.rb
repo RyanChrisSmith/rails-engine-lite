@@ -120,4 +120,5 @@ describe "Items API" do
     expect(item.name).to_not eq(previous_name)
     expect(item.name).to eq('Dragons Milk')
   end
+
 end
