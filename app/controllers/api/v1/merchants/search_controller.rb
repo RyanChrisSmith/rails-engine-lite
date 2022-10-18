@@ -1,10 +1,11 @@
 class Api::V1::Merchants::SearchController < ApplicationController
   def index
-    if params[:name] == ""
-      render status: 400
+    if params[:name] == "" || !params.include?(:name)
+      render json: { errors: {details: "A name must be provided to search" }}, status: 400
+    elsif Merchant.search_all(params[:name]) == []
+      render json: { data: [] }, status: 404
     else
-      merchant = Merchant.where('name ILIKE ?', "%#{params[:name]}%")
-      render json: MerchantSerializer.new(merchant)
+      render json: MerchantSerializer.new(Merchant.search_all(params[:name]))
     end
   end
 end
