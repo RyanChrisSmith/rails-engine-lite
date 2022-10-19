@@ -3,8 +3,6 @@ class Item < ApplicationRecord
   has_many :invoices, through: :invoice_items
   belongs_to :merchant
 
-  validates_presence_of :name, :description, :unit_price
-
   def self.search(name)
     where('name ILIKE ?', "%#{name}%").or(Item.where('description ILIKE ?', "%#{name}%")).first
   end
