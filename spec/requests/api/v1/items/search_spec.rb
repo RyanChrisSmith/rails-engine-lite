@@ -49,6 +49,42 @@ RSpec.describe 'Item Searches' do
     end
   end
 
+  it 'can find items below a maximum price point' do
+    merchant = create(:merchant)
+    item_1 = Item.create!(name: 'Turing school', description: 'stuff in the basement', unit_price: 22.99, merchant: merchant)
+    item_2 = Item.create!(name: 'Necklace', description: 'This silver chime will bring you cheer!', unit_price: 95.11, merchant: merchant)
+    item_3 = Item.create!(name: "Johns record", description: 'best music you ever heard', unit_price: 161.11, merchant: merchant)
+
+    get '/api/v1/items/find?max_price=150'
+
+    items_returned = JSON.parse(response.body, symbolize_names: true)
+
+    expect(response).to be_successful
+    expect(items_returned[:data].count).to eq 2
+
+    items_returned[:data].each do |item_returned|
+      expect(item_returned[:attributes][:name]).to_not include(item_3.name)
+    end
+  end
+
+  it 'can find items between a max and min price point' do
+    merchant = create(:merchant)
+    item_1 = Item.create!(name: 'Turing school', description: 'stuff in the basement', unit_price: 22.99, merchant: merchant)
+    item_2 = Item.create!(name: 'Necklace', description: 'This silver chime will bring you cheer!', unit_price: 95.11, merchant: merchant)
+    item_3 = Item.create!(name: "Johns record", description: 'best music you ever heard', unit_price: 161.11, merchant: merchant)
+
+    get '/api/v1/items/find?max_price=150&min_price=50'
+
+    items_returned = JSON.parse(response.body, symbolize_names: true)
+
+    expect(response).to be_successful
+    expect(items_returned[:data].count).to eq 1
+
+    items_returned[:data].each do |item_returned|
+      expect(item_returned[:attributes][:name]).to include(item_2.name)
+    end
+  end
+
   it 'will error when searching by price and name at the same time' do
     merchant = create(:merchant)
     item_1 = Item.create!(name: 'Turing school', description: 'stuff in the basement', unit_price: 22.99, merchant: merchant)
