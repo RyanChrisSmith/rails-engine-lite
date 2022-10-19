@@ -1,12 +1,13 @@
 require 'rails_helper'
 
 RSpec.describe Merchant, type: :model do
-  it { should have_many :items}
-  it { should have_many :invoices}
-  it { should have_many(:invoice_items).through(:items)}
-  it { should have_many(:transactions).through(:invoices)}
-  it { should have_many(:customers).through(:invoices)}
-
+  describe 'relationships' do
+    it { should have_many :items}
+    it { should have_many :invoices}
+    it { should have_many(:invoice_items).through(:items)}
+    it { should have_many(:transactions).through(:invoices)}
+    it { should have_many(:customers).through(:invoices)}
+  end
   describe 'class methods' do
     it 'can search for all by partial name fragment ' do
       merchant_1 = Merchant.create!(name: 'EMPloyee')
