@@ -128,8 +128,12 @@ RSpec.describe 'Item Searches' do
     item_2 = Item.create!(name: 'Necklace', description: 'This silver chime will bring you cheer!', unit_price: 55.11, merchant: merchant)
     item_3 = Item.create!(name: "Johns record", description: 'best music you ever heard', unit_price: 61.11, merchant: merchant)
 
-    get 'api/v1/items/find?min_price=-5'
+    get '/api/v1/items/find?min_price=-5'
+    returned = JSON.parse(response.body, symbolize_names: true)
 
-    require 'pry' ; binding.pry
+    expect(response.status).to eq 400
+    expect(returned).to have_key(:errors)
+    expect(returned[:errors]).to have_key(:details)
+    expect(returned[:errors][:details]).to eq("Price search cannot use a negative number")
   end
 end
