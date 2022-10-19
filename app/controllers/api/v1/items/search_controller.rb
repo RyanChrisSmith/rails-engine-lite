@@ -13,7 +13,7 @@ class Api::V1::Items::SearchController < ApplicationController
   private
   def check_for_faulty_params
     if (params[:name]) == "" || params[:min_price] == "" || params[:max_price] == ""
-      render status: 400
+      render json: {errors: { details: "A value must be input for searching"}}, status: 400
     elsif params[:name].present? && params[:min_price].present? || params[:max_price].present? && params[:name].present?
       render json: {errors: { details: "Must search by name OR price"}}, status: 400
     elsif (params[:min_price]).to_i < 0 || (params[:max_price]).to_i < 0
