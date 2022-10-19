@@ -47,6 +47,17 @@ RSpec.describe 'Item Searches' do
     expect(parsed[:data]).to eq({})
   end
 
+  it 'returns null as an object when there are no matches for the partial search' do
+    merchant = create(:merchant)
+    item_2 = Item.create!(name: 'Necklace', description: 'This silver chime will bring you cheer!', unit_price: 33.11, merchant: merchant)
+    item_1 = Item.create!(name: 'Turing school', description: 'stuff in the basement', unit_price: 22.99, merchant: merchant)
+    item_3 = Item.create!(name: "Johns record", description: 'best music you ever heard', unit_price: 1.11, merchant: merchant)
+
+
+    get '/api/v1/items/find?name='
+
+  end
+
   it 'can find the first item above a minimum price point' do
     merchant = create(:merchant)
     item_1 = Item.create!(name: 'Turing school', description: 'stuff in the basement', unit_price: 22.99, merchant: merchant)
