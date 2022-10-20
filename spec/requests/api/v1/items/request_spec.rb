@@ -120,4 +120,20 @@ describe "Items API" do
     expect(item.name).to_not eq(previous_name)
     expect(item.name).to eq('Dragons Milk')
   end
+
+  it 'cant update an existing item when merchant id doesnt exist' do
+    merchant = create(:merchant)
+    id = create(:item).id
+    previous_name = Item.last.name
+    item_params = { name: "Dragons Milk" }
+    headers = {"CONTENT_TYPE" => "application/json"}
+
+    patch api_v1_item_path(id), headers: headers, params: JSON.generate({item: item_params})
+    item = Item.find_by(id: id)
+
+    expect(response).to be_successful
+
+    expect(item.name).to_not eq(previous_name)
+    expect(item.name).to eq('Dragons Milk')
+  end
 end

@@ -4,7 +4,8 @@ class Item < ApplicationRecord
   belongs_to :merchant
 
   def self.search(name)
-    where('name ILIKE ?', "%#{name}%").or(Item.where('description ILIKE ?', "%#{name}%")).first
+    where('name ILIKE ?', "%#{name}%")
+    .or(Item.where('description ILIKE ?', "%#{name}%"))
   end
 
   def self.price_search(prices)

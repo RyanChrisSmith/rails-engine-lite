@@ -42,7 +42,6 @@ RSpec.describe 'Item Searches' do
 
     expect(response.status).to eq 200
     parsed = JSON.parse(response.body, symbolize_names: true)
-
     expect(parsed).to be_a(Hash)
     expect(parsed[:data]).to eq({})
   end
@@ -140,6 +139,68 @@ RSpec.describe 'Item Searches' do
     item_3 = Item.create!(name: "Johns record", description: 'best music you ever heard', unit_price: 61.11, merchant: merchant)
 
     get '/api/v1/items/find?min_price=-5'
+    returned = JSON.parse(response.body, symbolize_names: true)
+
+    expect(response.status).to eq 400
+    expect(returned).to have_key(:errors)
+    expect(returned[:errors]).to have_key(:details)
+    expect(returned[:errors][:details]).to eq("Price search cannot use a negative number")
+  end
+
+  it 'can find all items matching the partial name paramater' do
+    merchant = create(:merchant)
+    item_1 = Item.create!(name: 'Turing school', description: 'stuff in the basement', unit_price: 22.99, merchant: merchant)
+    item_2 = Item.create!(name: 'Necklace', description: 'This silver chime will bring you cheer!', unit_price: 33.11, merchant: merchant)
+    item_3 = Item.create!(name: "Johns record", description: 'best music you ever heard', unit_price: 1.11, merchant: merchant)
+
+
+    get '/api/v1/items/find_all?name=ring'
+    items_returned = JSON.parse(response.body, symbolize_names: true)
+    expect(response).to be_successful
+
+    expect(items_returned[:data].count).to eq 2
+    items_returned[:data].each do |item|
+      expect(item[:attributes][:name]).to_not include(item_3.name)
+    end
+  end
+
+  it 'can find all items using min and max price search parameters' do
+    merchant = create(:merchant)
+    item_1 = Item.create!(name: 'Turing school', description: 'stuff in the basement', unit_price: 1000, merchant: merchant)
+    item_2 = Item.create!(name: 'Necklace', description: 'This silver chime will bring you cheer!', unit_price: 2000, merchant: merchant)
+    item_3 = Item.create!(name: "Johns record", description: 'best music you ever heard', unit_price: 900, merchant: merchant)
+
+    get '/api/v1/items/find_all?min_price=999'
+    items_returned = JSON.parse(response.body, symbolize_names: true)
+    expect(response).to be_successful
+
+    items_returned[:data].each do |item|
+      expect(item[:attributes][:name]).to_not include(item_3.name)
+    end
+  end
+
+  it 'will return an empty object whent he price search is too large to find any matches' do
+    merchant = create(:merchant)
+    item_1 = Item.create!(name: 'Turing school', description: 'stuff in the basement', unit_price: 1000, merchant: merchant)
+    item_2 = Item.create!(name: 'Necklace', description: 'This silver chime will bring you cheer!', unit_price: 2000, merchant: merchant)
+    item_3 = Item.create!(name: "Johns record", description: 'best music you ever heard', unit_price: 900, merchant: merchant)
+
+    get '/api/v1/items/find_all?min_price=500000000'
+
+    returned = JSON.parse(response.body, symbolize_names: true)
+    expect(response.status).to eq 200
+    expect(returned).to be_a(Hash)
+    expect(returned[:data]).to eq({})
+  end
+
+
+  it 'cannot search ALL items by negative numbers' do
+    merchant = create(:merchant)
+    item_1 = Item.create!(name: 'Turing school', description: 'stuff in the basement', unit_price: 22.99, merchant: merchant)
+    item_2 = Item.create!(name: 'Necklace', description: 'This silver chime will bring you cheer!', unit_price: 55.11, merchant: merchant)
+    item_3 = Item.create!(name: "Johns record", description: 'best music you ever heard', unit_price: 61.11, merchant: merchant)
+
+    get '/api/v1/items/find_all?min_price=-5'
     returned = JSON.parse(response.body, symbolize_names: true)
 
     expect(response.status).to eq 400
