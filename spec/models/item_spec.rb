@@ -15,7 +15,7 @@ RSpec.describe Item, type: :model do
     end
 
     it 'can search for the first item matching name OR description parameter' do
-      expect(Item.search('ring')).to eq(@item_1)
+      expect(Item.search('ring')).to eq([@item_1,@item_2])
     end
 
     it 'can search by minumum price' do

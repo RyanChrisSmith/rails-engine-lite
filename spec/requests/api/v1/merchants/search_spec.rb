@@ -49,4 +49,39 @@ RSpec.describe 'Merchant Searches' do
     expect(response.status).to eq 404
     expect(found).to eq([])
   end
+
+  it 'searches by partial name parameter and returns the first merchant found' do
+    merchant_1 = Merchant.create!(name: 'EMPloyee')
+    merchant_2 = Merchant.create!(name: 'Emporer')
+    merchant_3 = Merchant.create!(name: 'The temp')
+    merchant_4 = Merchant.create!(name: 'Williams Tavern')
+    merchant_5 = Merchant.create!(name: "Emigo's")
+
+    get '/api/v1/merchants/find?name=emp'
+
+    merchant = JSON.parse(response.body, symbolize_names: true)
+
+    expect(response).to be_successful
+    expect(response.status).to eq 200
+    expect(merchant.count).to eq 1
+
+    expect(merchant[:data][:attributes][:name]).to eq(merchant_1.name)
+  end
+
+  it 'returns an empty hash when no name matches the parameter' do
+    merchant_1 = Merchant.create!(name: 'EMPloyee')
+    merchant_2 = Merchant.create!(name: 'Emporer')
+    merchant_3 = Merchant.create!(name: 'The temp')
+    merchant_4 = Merchant.create!(name: 'Williams Tavern')
+    merchant_5 = Merchant.create!(name: "Emigo's")
+
+    get '/api/v1/merchants/find?name=z'
+
+    merchant = JSON.parse(response.body, symbolize_names: true)
+
+    expect(response.status).to eq 404
+    expect(merchant.count).to eq 1
+
+    expect(merchant[:data]).to eq({})
+  end
 end
